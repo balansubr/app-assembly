@@ -12,7 +12,7 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "identity" }
 end
 
-username = " "
+username = "BooBoo"
 
 get "/" do
    if !session[:heroku_oauth_token]

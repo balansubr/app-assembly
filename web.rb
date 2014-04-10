@@ -21,9 +21,10 @@ get "/" do
     HTML
    else
      <<-HTML
-      Hello #{CGI.escapeHTML(username)}, Provide your deployment details below
+     Provide your deployment details below
         <form name="input" action="/deploy" method="get">
-          URL to source tarball: <input type="text" name="source_url"><br>
+          URL to source tarball: <input type="text" name="source_url" value="https://github.com/balansubr/heroku-oauth-example-ruby/tarball/master/"><br>
+          First name: <input type="text" name="firstname">
           Last name: <input type="text" name="lastname">
           <input type="submit" value="Submit">
         </form>
@@ -32,11 +33,7 @@ get "/" do
 end
 
 get "/deploy" do
-  if !session[:heroku_oauth_token]
-    redirect "/"
-  else
-   
-  end
+  redirect "/"
 end
 
 

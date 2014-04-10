@@ -12,23 +12,23 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "identity" }
 end
 
-username = "BooBoo"
+username = " "
 
 get "/" do
-  # if !session[:heroku_oauth_token]
-  #  <<-HTML
-  #  To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
-  #  HTML
-  # else
+   if !session[:heroku_oauth_token]
+    <<-HTML
+    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
+    HTML
+   else
      <<-HTML
-    Hello #{CGI.escapeHTML(username)}, Provide your deployment details below
-    <form name="input" action="/deploy" method="get">
-      URL to source tarball: <input type="text" name="source_url"><br>
-      Last name: <input type="text" name="lastname">
-      <input type="submit" value="Submit">
-    </form>
-  HTML
-  # end
+      Hello #{CGI.escapeHTML(username)}, Provide your deployment details below
+        <form name="input" action="/deploy" method="get">
+          URL to source tarball: <input type="text" name="source_url"><br>
+          Last name: <input type="text" name="lastname">
+          <input type="submit" value="Submit">
+        </form>
+    HTML
+   end
 end
 
 get "/deploy" do

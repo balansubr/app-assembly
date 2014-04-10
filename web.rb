@@ -18,7 +18,7 @@ get "/" do
     To deploy this app in your Heroku account please, <a href='/auth/heroku'>Sign in with Heroku</a>
     HTML
   else
-    <<-HTML
+     <<-HTML
     Hello #{CGI.escapeHTML(user_name)}, Provide your deployment details below
     <form name="input" action="/deploy" method="get">
       URL to source tarball: <input type="text" name="source_url"><br>
@@ -26,12 +26,15 @@ get "/" do
       <input type="submit" value="Submit">
     </form>
   HTML
+  end
 end
 
 get "/deploy" do
-  <<-HTML
-  I am going to deploy now!
-  HTML
+  if !session[:heroku_oauth_token]
+    redirect "/"
+  else
+   
+  end
 end
 
 
@@ -41,8 +44,9 @@ get "/auth/heroku/callback" do
   api = Excon.new(ENV["HEROKU_API_URL"] || "https://api.heroku.com",
       headers: { "Authorization" => "Bearer #{session[:heroku_oauth_token]}" },
       ssl_verify_peer: ENV["SSL_VERIFY_PEER"] != "false")
-    res = api.get(path: "/account", expects: 200)
-    user_name = MultiJson.decode(res.body)["name"]
+  res = api.get(path: "/account", expects: 200)
+  user_name = MultiJson.decode(res.body)["name"]
+  redirect "/"
 end
 
 get "/getting-started" do
@@ -54,7 +58,4 @@ get "/getting-started" do
       <li>See the email address</li>
     </ol>
   HTML
-end
-
-
 end

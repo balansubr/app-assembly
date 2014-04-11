@@ -21,6 +21,7 @@ get "/" do
     HTML
    else
      <<-HTML
+     <%= "You are signed in as "+username %>
      Provide your deployment details below
         <form name="input" action="/deploy" method="get">
           URL to source tarball: <input type="text" name="source_url" value="https://github.com/balansubr/heroku-oauth-example-ruby/tarball/master/"><br>

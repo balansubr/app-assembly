@@ -20,15 +20,16 @@ get "/" do
     To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
     HTML
    else
+     render "You are signed in as "+username
      <<-HTML
-     <%= "You are signed in as "+username %>
-     Provide your deployment details below
+     <p>Provide your deployment details below
         <form name="input" action="/deploy" method="get">
           URL to source tarball: <input type="text" name="source_url" value="https://github.com/balansubr/heroku-oauth-example-ruby/tarball/master/"><br>
           First name: <input type="text" name="firstname">
           Last name: <input type="text" name="lastname">
           <input type="submit" value="Submit">
         </form>
+        </p>
     HTML
    end
 end

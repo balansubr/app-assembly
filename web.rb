@@ -24,7 +24,7 @@ get "/" do
      <<-HTML
      <p>Provide your deployment details below<br><br>
         <form name="input" action="/deploy" method="get">
-          URL to source tarball: <input type="text" name="source_url" length="60" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
+          URL to source tarball: <input type="text" name="source_url" size="60" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
           First name: <input type="text" name="firstname"><br>
           Last name: <input type="text" name="lastname"><br>
           <input type="submit" value="Submit">
@@ -40,8 +40,10 @@ get "/deploy" do
   sourceurl = params[:source_url] || "Not specified"
   installedby = "personalized-clock-factory"
   
+  body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
+  
   res = Excon.post('https://nyata.herokuapp.com/app-setups',
-                  :body => '{ "source_blob": { "url": #{sourceurl} }, "env": { "INSTALLED_BY": #{installedby}, "LAST_NAME": #{lastname}, "FIRST_NAME": #{firstname} } }',
+                  :body => body,
                   :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
                  )
                  

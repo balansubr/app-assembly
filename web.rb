@@ -10,7 +10,7 @@ require "base64"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
-  provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "identity" }
+  provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
 
 get "/" do

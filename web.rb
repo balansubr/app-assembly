@@ -24,7 +24,7 @@ get "/" do
      <<-HTML
      <p>Provide your deployment details below<br><br>
         <form name="input" action="/deploy" method="get">
-          URL to source tarball: <input type="text" name="source_url" length="60" value="https://github.com/balansubr/heroku-oauth-example-ruby/tarball/master/"><br>
+          URL to source tarball: <input type="text" name="source_url" length="60" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
           First name: <input type="text" name="firstname"><br>
           Last name: <input type="text" name="lastname"><br>
           <input type="submit" value="Submit">

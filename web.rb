@@ -6,6 +6,7 @@ require "multi_json"
 require "sinatra"
 require "omniauth"
 require "omniauth-heroku"
+require "base64"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
@@ -41,9 +42,12 @@ get "/deploy" do
   
   res = Excon.post('https://nyata.herokuapp.com/app-setups',
                   :body => '{ "source_blob": { "url": #{sourceurl} }, "env": { "INSTALLED_BY": #{installedby}, "LAST_NAME": #{lastname}, "FIRST_NAME": #{firstname} } }',
-                  :headers => { "Authorization" => "Bearer #{session[:heroku_oauth_token]}", "Content-Type" => "application/json"}
+                  :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
                  )
                  
+  # "Authorization" => "Bearer #{session[:heroku_oauth_token]}"
+  # "Authorization" => "Basic OjIzZjFjYzY0LWRmMjItNDM2OS05OWMxLTExYjNkYmYyZWVjNg=="
+  
   message = MultiJson.decode(res.body)["message"] || MultiJson.decode(res.body)["status"]
            
   <<-HTML

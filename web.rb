@@ -13,8 +13,6 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "identity" }
 end
 
-username = "BooBoo"
-
 get "/" do
    if !session[:heroku_oauth_token]
    <<-HTML
@@ -63,11 +61,6 @@ end
 get "/auth/heroku/callback" do
   session[:heroku_oauth_token] =
     request.env["omniauth.auth"]["credentials"]["token"]
-#  api = Excon.new(ENV["HEROKU_API_URL"] || "https://api.heroku.com",
-#      headers: { "Authorization" => "Bearer #{session[:heroku_oauth_token]}" },
-#      ssl_verify_peer: ENV["SSL_VERIFY_PEER"] != "false")
-#  res = api.get(path: "/account", expects: 200)
-#  username = MultiJson.decode(res.body)["name"]
   redirect "/"
 end
 

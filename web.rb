@@ -51,6 +51,7 @@ get "/deploy" do
   message = MultiJson.decode(res.body)["message"] || MultiJson.decode(res.body)["status"]
            
   <<-HTML
+      #{CGI.escapeHTML(sourceurl)}
       #{CGI.escapeHTML(message)}
     HTML
  

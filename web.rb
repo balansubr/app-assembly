@@ -22,7 +22,7 @@ get "/" do
      <<-HTML
      <p>Provide your deployment details below<br><br>
         <form name="input" action="/deploy" method="get">
-          URL to source tarball: <input type="text" name="source_url" size="60" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
+          URL to source tarball: <input type="text" name="source_url" size="80" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
           First name: <input type="text" name="firstname"><br>
           Last name: <input type="text" name="lastname"><br>
           <input type="submit" value="Submit">
@@ -49,12 +49,28 @@ get "/deploy" do
   # "Authorization" => "Basic OjIzZjFjYzY0LWRmMjItNDM2OS05OWMxLTExYjNkYmYyZWVjNg=="
   
   message = MultiJson.decode(res.body)["message"] || MultiJson.decode(res.body)["status"]
-           
+  
+  if message == "pending"
+     session[:setupid] = MultiJson.decode(res.body)["id"]
+     session[:buildid] = MultiJson.decode(res.body)["build"]["id"]
+     redirect "/status"
+  end  
   <<-HTML
       #{CGI.escapeHTML(sourceurl)}
-      #{CGI.escapeHTML(message)}
+      {CGI.escapeHTML(message)}
     HTML
- 
+end
+
+get "/status" do
+  res = Excon.get('https://nyata.herokuapp.com/app-setups/'+session[:setupid])
+  <<-HTML
+    {CGI.escapeHTML(res.body)}
+    HTML
+  newstatus = MultiJson.decode(res.body)["status"]
+  if(newstatus == "pending") 
+    sleep(5)
+    redirect "/status"
+  end
 end
 
 

@@ -68,11 +68,6 @@ get "/status" do
   newstatus = MultiJson.decode(res.body)["status"]
   body res.body
   
-  if(newstatus == "pending")
-    sleep(5)
-    redirect "/status"
-  end
-  
 #  <<-HTML
 #    {CGI.escapeHTML(session[:setupid])}
 #    HTML

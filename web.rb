@@ -66,12 +66,16 @@ get "/status" do
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"]
-  output = "Overall status:"+newstatus+"<br>Detailed status:<br>"+res.body
+  appname = MultiJson.decode(res.body)["app"]["name"]
+  
+  buildcall = Excon.new("https://api.heroku.com/",
+      headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+  buildres = statuscall.get(path: "/apps/"+appname+"/builds/"+session[:buildid]+"/result")
+  output = "Overall status:" + newstatus + "<br>"
+            + "Detailed status: <br> " + res.body + "<br>"
+            + "Build status: <br>" + buildres.body + "<br>"
+            + "<h2>Please refresh page for status updates</h2>"
   body output
-  if(newstatus=="pending")
-    sleep 10
-    redirect to("/status")
-  end
 #  <<-HTML
 #    {CGI.escapeHTML(session[:setupid])}
 #    HTML

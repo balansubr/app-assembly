@@ -74,10 +74,11 @@ get "/status" do
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
     buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
     buildres = statuscall.get(path: buildcallpath )
-    buildstatus = buildres.body || "None yet"
   end
   
-  output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>" # + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
+  buildstatus = buildres.body || "None yet"
+  
+  output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>"  + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
   body output
 #  <<-HTML
 #    {CGI.escapeHTML(session[:setupid])}

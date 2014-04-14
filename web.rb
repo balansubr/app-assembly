@@ -69,14 +69,15 @@ get "/status" do
   appname = MultiJson.decode(res.body)["app"]["name"]
   buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
   
+  buildstats = "None yet"
+  
   if(buildid!="none")
     buildcall = Excon.new("https://api.heroku.com/",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
     buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
     buildres = statuscall.get(path: buildcallpath )
+    buildstatus = buildres.body || "None yet"
   end
-  
-  buildstatus = buildres.body || "None yet"
   
   output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>"  + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
   body output

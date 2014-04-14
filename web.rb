@@ -51,8 +51,8 @@ get "/deploy" do
   message = MultiJson.decode(res.body)["message"] || MultiJson.decode(res.body)["status"]
   
   if message == "pending"
-     session[:setupid] = MultiJson.decode(res.body)["id"]
-     session[:buildid] = MultiJson.decode(res.body)["build"]["id"]
+     session[:setupid] = MultiJson.decode(res.body)["id"] || ""
+     session[:buildid] = MultiJson.decode(res.body)["build"]["id"] || ""
      redirect "/status"
   end  
   <<-HTML
@@ -67,14 +67,19 @@ get "/status" do
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"]
   appname = MultiJson.decode(res.body)["app"]["name"]
+  buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
   
-  buildcall = Excon.new("https://api.heroku.com/",
+  if(buildid!="none")
+    buildcall = Excon.new("https://api.heroku.com/",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-  buildcallpath = "/apps/"+appname+"/builds/"+session[:buildid]+"/result"
-  buildres = statuscall.get(path: buildcallpath )
+    buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
+    buildres = statuscall.get(path: buildcallpath )
+    buildstatus = buildres.body || "None yet"
+  end
+  
   output = "Overall status:" + newstatus + "<br>" 
             + "Detailed status: <br> " + res.body + "<br>" 
-            + "Build status: <br>" + buildres.body + "<br>" 
+            + "Build status: <br>" + buildstatus + "<br>" 
             + "<h2>Please refresh page for status updates</h2>"
   body output
 #  <<-HTML

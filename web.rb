@@ -79,20 +79,8 @@ get "/status" do
     buildstatus = buildres.body || "None yet"
   end
   
-  output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>"  + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
+  output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>"  + "Build status: <br>" #+ buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
   body output
-#  <<-HTML
-#    {CGI.escapeHTML(session[:setupid])}
-#    HTML
-#  res = Excon.get('https://nyata.herokuapp.com/app-setups/'+session[:setupid])
-#  <<-HTML
-#    {CGI.escapeHTML(res.body)}
-#    HTML
-#  newstatus = MultiJson.decode(res.body)["status"]
-#  if(newstatus == "pending") 
-#    sleep(5)
-#    redirect "/status"
-#  end
 end
 
 

@@ -77,7 +77,7 @@ get "/status" do
     buildstatus = buildres.body || "None yet"
   end
   
-  output = "Overall status:" + newstatus + "<br>" + "Detailed status: <br> " + res.body + "<br>" + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
+  output = "Overall status:" + newstatus + "<br>" #+ "Detailed status: <br> " + res.body + "<br>" + "Build status: <br>" + buildstatus + "<br>" + "<h2>Please refresh page for status updates</h2>"
   body output
 #  <<-HTML
 #    {CGI.escapeHTML(session[:setupid])}

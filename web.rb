@@ -66,8 +66,12 @@ get "/status" do
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"]
-  body res.body
-  
+  output = "Overall status:"+newstatus+"<br>Detailed status:<br>"+res.body
+  body output
+  if(newstatus=="pending")
+    sleep(10.seconds)
+    redirect to("/status")
+  end
 #  <<-HTML
 #    {CGI.escapeHTML(session[:setupid])}
 #    HTML

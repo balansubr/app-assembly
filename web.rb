@@ -62,6 +62,9 @@ get "/deploy" do
 end
 
 get "/status" do
+  <<-HTML
+    {CGI.escapeHTML(session[:setupid])}
+    HTML
   res = Excon.get('https://nyata.herokuapp.com/app-setups/'+session[:setupid])
   <<-HTML
     {CGI.escapeHTML(res.body)}

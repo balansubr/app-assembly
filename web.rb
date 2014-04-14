@@ -69,7 +69,7 @@ get "/status" do
   appname = MultiJson.decode(res.body)["app"]["name"]
   buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
   
-  buildstats = "None yet"
+  buildstatus = "None yet"
   
   if(buildid!="none")
     buildcall = Excon.new("https://api.heroku.com/",

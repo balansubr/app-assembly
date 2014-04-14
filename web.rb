@@ -64,7 +64,7 @@ end
 get "/status" do
   statuscall = Excon.new("https://nyata.herokuapp.com",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-  res = api.get(path: "/app-setups/"+session[:setupid])
+  res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"]
   code = "<%= newstatus %>"
   erb code

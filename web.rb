@@ -69,7 +69,7 @@ get "/status" do
   output = "Overall status:"+newstatus+"<br>Detailed status:<br>"+res.body
   body output
   if(newstatus=="pending")
-    sleep(10.seconds)
+    sleep 10
     redirect to("/status")
   end
 #  <<-HTML

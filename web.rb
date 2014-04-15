@@ -41,7 +41,7 @@ get "/deploy" do
   
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
   
-  res = Excon.post("https://nyata.herokuapp.com",
+  res = Excon.post("https://nyata.herokuapp.com/app-setups",
                   :body => body,
                   :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
                  )
@@ -72,7 +72,7 @@ end
 
 get "/overall-status" do
   # get the overall status
-  statuscall = Excon.new("https://nyata.herokuapp.com",
+  statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
   res = statuscall.get(path: "/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"]
@@ -91,9 +91,9 @@ end
 
 get "/setup-status" do
     # get the overall status
-    statuscall = Excon.new("https://nyata.herokuapp.com",
+    statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-    res = statuscall.get(path: "/app-setups/"+session[:setupid])
+    res = statuscall.get(path: "/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"]
  
     overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(res.body, :pretty => true) + "<br><br>"
@@ -104,7 +104,7 @@ get "/build-status" do
     # get the build status
     if(!session[:buildid])
         # get the overall status
-        statuscall = Excon.new("https://nyata.herokuapp.com",
+        statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         res = statuscall.get(path: "/"+session[:setupid])
         buildid = MultiJson.decode(res.body)["build"]["id"] || "none"

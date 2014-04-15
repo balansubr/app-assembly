@@ -140,6 +140,7 @@ get "/overall-status" do
 
   statusmsg = newstatus
   if(newstatus == "failed")
+    puts res.body
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")

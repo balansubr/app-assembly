@@ -85,7 +85,7 @@ get "/deploy" do
     dochop = true
   end
   if(dochop) 
-     envStr.chop   
+     envStr.chop!   
   end
 
 =begin    

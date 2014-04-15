@@ -94,7 +94,7 @@ get "/setup-status" do
     statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
     res = statuscall.get(path: "/"+session[:setupid])
-    newstatus = MultiJson.decode(res.body)["status"]
+    newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
  
     overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(res.body, :pretty => true) + "<br><br>"
     body overallstatus

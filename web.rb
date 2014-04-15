@@ -127,8 +127,7 @@ get "/overall-status" do
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
-    statusmsg = 'Link to your own clock: <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '">Click here</a>'
-    puts "*******************" + statusmsg
+    statusmsg = 'To try the app we just setup for you, <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '">Click here</a>'
   end
   
   body statusmsg

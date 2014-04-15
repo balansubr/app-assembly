@@ -115,7 +115,7 @@ get "/build-status" do
         session[:buildid] = buildid
         buildcall = Excon.new("https://api.heroku.com/",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-        buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
+        buildcallpath = "/apps/" + session[:appname] + "/builds/" + buildid + "/result"
         buildres = statuscall.get(path: buildcallpath )
         buildstatusdetails = buildres.body      
     end

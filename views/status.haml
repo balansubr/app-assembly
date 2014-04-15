@@ -1,0 +1,25 @@
+!!! 5
+%html
+  %head
+    %meta(charset="utf-8")
+    %title Deployment status
+    :css
+      #spinner{display:none;position:absolute;left:200px;top:32px;}
+    %script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js")
+    %script(src="/status.js")
+    
+  %body
+    %h2 Deployment status for #{appname}
+    %img#spinner(src="spinner.gif")
+    #overallstatus
+      Initiated
+   
+    %h3 Overall setup details
+    #setupdetails
+      No details yet
+
+    %h3 Build status
+    #builddetails
+      No details yet
+    
+    

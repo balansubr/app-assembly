@@ -22,7 +22,7 @@ get "/" do
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-    installedby = "personalization-factory" # see if there is a way to get this from the env
+    installedby = "app-assembly" # see if there is a way to get this from the env
 
      # a better way might be to read this from a file
     session[:aname] = "Personalized Clock"

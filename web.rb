@@ -22,10 +22,12 @@ get "/" do
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
+    installedby = "personalization-factory" # see if there is a way to get this from the env
+
      # a better way might be to read this from a file
     session[:aname] = "Personalized Clock"
     session[:desc] = "A simple clock that greets you by name, everytime!"
-    session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>""}
+    session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>"","INSTALLED_BY"=>installedby}
     session[:addons] = ["heroku-postgresql","papertrail"]
     session[:success_url] = "/clock/currenttime"
     session[:website] = "https://github.com/balansubr/SampleTimeApp"
@@ -76,8 +78,6 @@ get "/deploy" do
   
   sourceurl = params[:source_url] || ""
   params.delete("source_url")  
-  installedby = "personalization-factory" # see if there is a way to get this from the env
-
   envStr = ''
   dochop = false
   params.each do |var_name, var_value|

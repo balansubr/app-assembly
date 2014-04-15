@@ -6,7 +6,7 @@
   %body
     %h2 Deployment details for #{app} (#{desc})
     For more information please visit <a href="#{website}">#{website}</a>
-    %form(action='/deploy' method="GET")
+    %form(name='/input' action='/deploy' method="get")
     %h3 The following configuration variables will be set
     %p
     - vars.each do | var_name, default_value |

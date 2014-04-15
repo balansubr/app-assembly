@@ -78,7 +78,7 @@ get "/overall-status" do
   newstatus = MultiJson.decode(res.body)["status"] 
   id = MultiJson.decode(res.body)["id"]
 
-  statusmsg = "Trying with "+session[:setupid]+" Getting "+res.body
+  statusmsg = "Trying with "+session[:setupid]+" and "+"Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}"+"<br> Getting "+res.body
   if(newstatus == "failed")
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end

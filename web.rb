@@ -8,7 +8,6 @@ require "omniauth"
 require "omniauth-heroku"
 require "base64"
 require "haml"
-require "JSON"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do

@@ -1,0 +1,35 @@
+{
+    "name": "Personalized Clock",
+    "description": "A simple clock that greets you by name, everytime!",
+    "keywords": ["app.json", "clock", "config"],
+    "urls": {
+        "website": "https://github.com/balansubr/SampleTimeApp",
+        "success": "/clock/currenttime"
+    },
+    "env": {
+        "FIRST_NAME": {
+            "description": "So that we can be personal",
+            "default": "John",
+            "required": true
+        },
+        "LAST_NAME": {
+            "description": "Has a default but can be overridden",
+            "default": "Doe"
+        },
+        "INSTALLED_BY": {
+            "description": "Who installed this for you",
+            "default": "Unknown"
+        },
+        "COOKIE_SECRET": {
+            "description": "This gets generated",
+            "generator": "secret"
+        }
+    },
+    "addons": [
+    	"heroku-postgresql"
+    ],
+    "scripts": {
+    	"postdeploy":"rake db:migrate"
+    }
+}
+

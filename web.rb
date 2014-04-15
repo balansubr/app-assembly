@@ -15,25 +15,32 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
 
-# by default, the deployer is setup for a specific app.json
+# by default, the deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+    session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+    session[:appjsonfile] = params[:jsonlocation] || "clock_app.json"
+    
+    jsonstr = ''
+    File.open('public/apps/'+session[:appjsonfile], 'r') do |f|
+      f.each_line do |line|
+        jsonstr.concat(line)
+      end
+    end
+    if(jsonstr=='')
+      body "Invalid app configuration specified."
+    end
     installedby = "app-assembly" # see if there is a way to get this from the env
 
-     # a better way might be to read this from a file
-    session[:aname] = "Personalized Clock"
-    session[:desc] = "A simple clock that greets you by name, everytime!"
-    session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>"","INSTALLED_BY"=>installedby}
-    session[:addons] = ["heroku-postgresql"]
-    session[:success_url] = "/clock/currenttime"
-    session[:website] = "https://github.com/balansubr/SampleTimeApp"
-    haml :form, :locals => {:app => session[:aname], 
-                            :desc => session[:desc], 
+    jsonparams = JSON.parse(jsonstr)
+    processJson(jsonparams)
+    
+    haml :form, :locals => {:app => session[:name], 
+                            :desc => session[:description], 
                             :adds => session[:addons], 
                             :vars => session[:configvar_defaults],
                             :website => session[:website],
@@ -42,42 +49,30 @@ get "/" do
    end
 end
 
-# you can also post an app.json to the deployer
-post "/" do
-   params = JSON.parse(request.env["rack.input"].read)
-   processJson(params)
-
-   haml :form, :locals => {:app => session[:name], 
-                            :desc => session[:description], 
-                            :adds => session[:addons], 
-                            :vars => session[:configvar_defaults],
-                            :website => session[:website],
-                            :source_url => session[:source_url]
-                            }  
-end
-
 def processJson(input_json)
-  session[:source_url] = input_json["source_url"] # this is not part of the app.json schema but needs to be passed in anyway
   session[:name] = input_json["name"] || "No name"
   session[:description] = input_json["description"] || ""
   
   configvars_defaults = Hash.new # this will hold the key and default value for now
   allvars = input_json["env"]
   allvars.each do | var, var_details |
-    if(var_details["generator"]=="") # if something is going to be generated exclude it from the form
-      configvars_defaults[:var] = var_details["default"] || ""
+    if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
+      configvar_defaults[var] = var_details["default"] || ""
     end
   end
-  session[:configvar_defaults] = configvars_defaults
+  session[:configvar_defaults] = configvar_defaults
   session[:addons] = input_json["addons"] 
   session[:success_url] = input_json["urls"]["success"]
   session[:website] = input_json["urls"]["website"]
+  
+  session[:configvar_defaults].each do |key, value|
+    puts key
+  end
 end
 
 get "/deploy" do
-  
-  sourceurl = params[:source_url] || ""
-  params.delete("source_url")  
+  sourceurl = session[:source_url]
+
   envStr = ''
   dochop = false
   params.each do |var_name, var_value|
@@ -88,17 +83,7 @@ get "/deploy" do
      envStr.chop!   
   end
 
-=begin    
-  firstname = params[:firstname] || "Not specified"
-  lastname = params[:lastname] || "Not specified"
-  sourceurl = params[:source_url] || "Not specified"
-  installedby = "personalized-clock-factory"
-  
-  body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
-=end
-
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { ' + envStr + '} }'
-  
   puts body
   
   res = Excon.post("https://nyata.herokuapp.com/app-setups",
@@ -106,9 +91,6 @@ get "/deploy" do
                   :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
                  )
                  
-  # "Authorization" => "Bearer #{session[:heroku_oauth_token]}"
-  # "Authorization" => "Basic OjIzZjFjYzY0LWRmMjItNDM2OS05OWMxLTExYjNkYmYyZWVjNg=="
-  
   id = MultiJson.decode(res.body)["id"]
   
   if(id=="invalid_params" || id=="")
@@ -196,11 +178,6 @@ end
 
 get "/getting-started" do
   <<-HTML
-    Try this app:
-    <ol>
-      <li>Go to the provisioned app's URL</li>
-      <li>Log into a different heroku ID</li>
-      <li>See the email address</li>
-    </ol>
+    
   HTML
 end

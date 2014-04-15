@@ -115,7 +115,8 @@ get "/build-status" do
     end
     if(session[:buildid])
         buildcall = Excon.new("https://api.heroku.com",
-                        headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+                        headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
+                                   "Accept" => "application/vnd.heroku+json; version=3"  })
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = MultiJson.dump(buildres.body, :pretty => true) 

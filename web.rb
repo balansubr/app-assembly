@@ -85,6 +85,8 @@ get "/overall-status" do
   if(newstatus == "succeeded")
     statusmsg = "Link to your own clock: <a href=\"" + session[:appname] + ".herokuapp.com" + success_url + "\">Click here</a>"
   end
+  
+  body statusmsg
 end
 
 get "/setup-details" do
@@ -94,8 +96,8 @@ get "/setup-details" do
     res = statuscall.get(path: "/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"]
  
-    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
-    body overallstatus
+    # overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
+    body res.body
 end
 
 get "/build-details" do

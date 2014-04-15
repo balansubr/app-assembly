@@ -6,7 +6,7 @@
   %body
     %h2 Deployment details for #{app} (#{desc})
     For more information please visit <a href="#{website}">#{website}</a>
-    %form(name='/input' action='/deploy' method="get")
+    %form(name='input' action='/deploy' method="get")
     %h3 The following configuration variables will be set
     %p
     - vars.each do | var_name, default_value |
@@ -17,4 +17,4 @@
     %h3 The following addons will be added to your application
     - adds.each do |addon_name|
       %p #{addon_name}             
-    %input(type='submit' value='Lets go')
+      %input(type='submit' value='Lets go')

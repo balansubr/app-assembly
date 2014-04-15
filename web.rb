@@ -76,6 +76,7 @@ get "/deploy" do
   
   envStr = ''
   dochop = false
+  params.delete("source_url")
   params.each do |var_name, var_value|
     envStr = envStr + '"' + var_name + '":"' + var_value + '",'
     dochop = true

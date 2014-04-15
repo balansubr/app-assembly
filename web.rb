@@ -8,38 +8,91 @@ require "omniauth"
 require "omniauth-heroku"
 require "base64"
 require "haml"
+require "json"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
 
+# by default, the deployer is setup for a specific app.json
 get "/" do
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-     <<-HTML
-     <p>Provide your deployment details below<br><br>
-        <form name="input" action="/deploy" method="get">
-          URL to source tarball: <input type="text" name="source_url" size="80" value="https://github.com/balansubr/SampleTimeApp/tarball/master/"><br>
-          First name: <input type="text" name="firstname"><br>
-          Last name: <input type="text" name="lastname"><br>
-          <input type="submit" value="Submit">
-        </form>
-        </p>
-   HTML
+     # a better way might be to read this from a file
+    session[:aname] = "Personalized Clock"
+    session[:desc] = "A simple clock that greets you by name, everytime!"
+    session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>""}
+    session[:addons] = ["heroku-postgresql"]
+    session[:success_url] = "/clock/currenttime"
+    session[:website] = "https://github.com/balansubr/SampleTimeApp"
+    haml :form, :locals => {:app => session[:aname], 
+                            :desc => session[:desc], 
+                            :adds => session[:addons], 
+                            :vars => session[:configvar_defaults],
+                            :website => session[:website]}  
+   end
+end
+
+# you can also post an app.json to the deployer
+post "/" do
+   params = JSON.parse(request.env["rack.input"].read)
+   processJson(params)
+
+   haml :form, :locals => {:app => session[:name], 
+                            :desc => session[:description], 
+                            :adds => session[:addons], 
+                            :vars => session[:configvar_defaults],
+                            :website => session[:website]}  
+end
+
+def processJson(input_json)
+  session[:name] = input_json["name"] || "No name"
+  session[:description] = input_json["description"] || ""
+  
+  configvars_defaults = Hash.new # this will hold the key and default value for now
+  allvars = input_json["env"]
+  allvars.each do | var, var_details |
+    if(var_details["generator"]=="") # if something is going to be generated exclude it from the form
+      configvars_defaults[:var] = var_details["default"] || ""
+    end
   end
+  session[:configvar_defaults] = configvars_defaults
+  session[:addons] = input_json["addons"] 
+  session[:success_url] = input_json["urls"]["success"]
+  session[:website] = input_json["urls"]["website"]
 end
 
 get "/deploy" do
+  
+  envStr = ''
+  dochop = false
+  params.each do |var_name, var_value|
+    envStr = envStr + '"' + var_name + '":"' + var_value + '",'
+    dochop = true
+  end
+  if(dochop) 
+     envStr.chop   
+  end
+
+=begin    
   firstname = params[:firstname] || "Not specified"
   lastname = params[:lastname] || "Not specified"
   sourceurl = params[:source_url] || "Not specified"
   installedby = "personalized-clock-factory"
   
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
+=end
+
+  sourceurl = params[:source_url] || ""
+  installedby = "personalization-factory"
+  
+  body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { ' + envStr + '} }'
+  
+  puts body
   
   res = Excon.post("https://nyata.herokuapp.com/app-setups",
                   :body => body,
@@ -83,7 +136,7 @@ get "/overall-status" do
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
-    statusmsg = "Link to your own clock: <a href=\"http://" + session[:appname] + ".herokuapp.com/clock/currenttime/\">Click here</a>"
+    statusmsg = "Link to your own clock: <a href=\"http://" + session[:appname] + ".herokuapp.com" + session[:success_url]+ ">Click here</a>"
   end
   
   body statusmsg

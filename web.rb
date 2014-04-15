@@ -72,9 +72,9 @@ end
 
 get "/overall-status" do
   # get the overall status
-  statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
+  statuscall = Excon.new("https://nyata.herokuapp.com",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-  res = statuscall.get(path: "/"+session[:setupid])
+  res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"] 
   id = MultiJson.decode(res.body)["id"]
 
@@ -91,9 +91,9 @@ end
 
 get "/setup-status" do
     # get the overall status
-    statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
+    statuscall = Excon.new("https://nyata.herokuapp.com",
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-    res = statuscall.get(path: "/"+session[:setupid])
+    res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
  
     overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(res.body, :pretty => true) + "<br><br>"

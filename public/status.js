@@ -10,7 +10,7 @@ function update_status() {
             $("#overallstatus").html(data);
             $("#setupstatus").load("/setup-status");
             $("#buildstatus").load("/build-status");
-            window.setTimeout(update_status, 10000);
+            window.setTimeout(update_status, 5000);
           },
           'text');
 }

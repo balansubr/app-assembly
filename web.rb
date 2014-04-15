@@ -53,7 +53,7 @@ def processJson(input_json)
   session[:name] = input_json["name"] || "No name"
   session[:description] = input_json["description"] || ""
   
-  configvars_defaults = Hash.new # this will hold the key and default value for now
+  configvar_defaults = Hash.new # this will hold the key and default value for now
   allvars = input_json["env"]
   allvars.each do | var, var_details |
     if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form

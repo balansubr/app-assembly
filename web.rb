@@ -49,7 +49,7 @@ get "/deploy" do
   # "Authorization" => "Bearer #{session[:heroku_oauth_token]}"
   # "Authorization" => "Basic OjIzZjFjYzY0LWRmMjItNDM2OS05OWMxLTExYjNkYmYyZWVjNg=="
   
-  id = MultiJson.decode(res.body)["id"] || ""
+  id = MultiJson.decode(res.body)["id"]
   
   if(id=="invalid_params" || id=="")
       message = MultiJson.decode(res.body)["message"]
@@ -78,7 +78,7 @@ get "/overall-status" do
   newstatus = MultiJson.decode(res.body)["status"]
   id = MultiJson.decode(res.body)["id"]
 
-  statusmsg = "Pending"
+  statusmsg = "Pending [ID: "+session[:setupid]+"]"
   if(newstatus == "failed")
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end

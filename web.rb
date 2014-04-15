@@ -74,9 +74,12 @@ end
 
 get "/deploy" do
   
+  sourceurl = params[:source_url] || ""
+  params.delete("source_url")  
+  installedby = "personalization-factory" # see if there is a way to get this from the env
+
   envStr = ''
   dochop = false
-  params.delete("source_url")
   params.each do |var_name, var_value|
     envStr = envStr + '"' + var_name + '":"' + var_value + '",'
     dochop = true
@@ -94,9 +97,6 @@ get "/deploy" do
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
 =end
 
-  sourceurl = params[:source_url] || ""
-  installedby = "personalization-factory"
-  
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { ' + envStr + '} }'
   
   puts body

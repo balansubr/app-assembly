@@ -110,7 +110,7 @@ get "/build-status" do
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
     end
-    buildstatus = "None yet"
+    buildstatus = "Got build id"+session[:buildid]
     buildstatusdetails = ""
     if(session[:buildid])
         buildcall = Excon.new("https://api.heroku.com/",

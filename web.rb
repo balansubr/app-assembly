@@ -38,6 +38,7 @@ get "/" do
 
     jsonparams = JSON.parse(jsonstr)
     processJson(jsonparams)
+    session[:configvar_defaults]["INSTALLED_BY"] = installedby
     
     haml :form, :locals => {:app => session[:name], 
                             :desc => session[:description], 

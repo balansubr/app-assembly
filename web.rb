@@ -81,7 +81,8 @@ get "/overall-status" do
   statusmsg = "Pending"
   if(newstatus == "failed")
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
-  else if(newstatus == "succeeded")
+  end
+  if(newstatus == "succeeded")
     statusmsg = "Link to your own clock: <a href=\"" + session[:appname] + ".herokuapp.com" + success_url + "\">Click here</a>"
   end
 end
@@ -135,5 +136,4 @@ get "/getting-started" do
       <li>See the email address</li>
     </ol>
   HTML
-end
 end

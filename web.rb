@@ -28,7 +28,7 @@ get "/" do
     session[:aname] = "Personalized Clock"
     session[:desc] = "A simple clock that greets you by name, everytime!"
     session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>"","INSTALLED_BY"=>installedby}
-    session[:addons] = ["heroku-postgresql","papertrail"]
+    session[:addons] = ["heroku-postgresql"]
     session[:success_url] = "/clock/currenttime"
     session[:website] = "https://github.com/balansubr/SampleTimeApp"
     session[:source_url] = "https://github.com/balansubr/SampleTimeApp/tarball/master/"

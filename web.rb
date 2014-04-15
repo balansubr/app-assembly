@@ -102,6 +102,8 @@ end
 
 get "/build-status" do
     # get the build status
+    buildstatus = "Build not started"
+    buildstatusdetails = "Not available"
     if(!session[:buildid])
         # get the overall status
         statuscall = Excon.new("https://nyata.herokuapp.com",
@@ -109,18 +111,19 @@ get "/build-status" do
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
+        buildstatus = "Build id"+session[:buildid]
     end
-    buildstatus = "Got build id"+session[:buildid]
-    buildstatusdetails = ""
     if(session[:buildid])
         buildcall = Excon.new("https://api.heroku.com/",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         buildres = statuscall.get(path: buildcallpath )
-        buildstatusdetails = buildres.body      
+        buildstatusdetails = MultiJson.dump(buildres.body, :pretty => true) 
+        buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+             
     end
     
-    body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(buildstatusdetails, :pretty => true) + "<br><br>"
+    body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
 end
 
 

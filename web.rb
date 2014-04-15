@@ -96,8 +96,8 @@ get "/setup-status" do
     res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"]
  
-    # overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
-    body "Sent "+session[:setupid]+" Received: "+res.body
+    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
+    body overallstatus
 end
 
 get "/build-status" do

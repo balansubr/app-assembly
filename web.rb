@@ -101,6 +101,7 @@ get "/setup-details" do
 end
 
 get "/build-details" do
+    body "nothing yet"
     # get the build status
     if(!session[:buildid])
         # get the overall status

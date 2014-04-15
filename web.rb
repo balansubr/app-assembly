@@ -26,14 +26,17 @@ get "/" do
     session[:aname] = "Personalized Clock"
     session[:desc] = "A simple clock that greets you by name, everytime!"
     session[:configvar_defaults] = {"FIRST_NAME"=>"World","LAST_NAME"=>""}
-    session[:addons] = ["heroku-postgresql"]
+    session[:addons] = ["heroku-postgresql","papertrail"]
     session[:success_url] = "/clock/currenttime"
     session[:website] = "https://github.com/balansubr/SampleTimeApp"
+    session[:source_url] = "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     haml :form, :locals => {:app => session[:aname], 
                             :desc => session[:desc], 
                             :adds => session[:addons], 
                             :vars => session[:configvar_defaults],
-                            :website => session[:website]}  
+                            :website => session[:website],
+                            :source_url => session[:source_url]
+                            }  
    end
 end
 
@@ -46,10 +49,13 @@ post "/" do
                             :desc => session[:description], 
                             :adds => session[:addons], 
                             :vars => session[:configvar_defaults],
-                            :website => session[:website]}  
+                            :website => session[:website],
+                            :source_url => session[:source_url]
+                            }  
 end
 
 def processJson(input_json)
+  session[:source_url] = input_json["source_url"] # this is not part of the app.json schema but needs to be passed in anyway
   session[:name] = input_json["name"] || "No name"
   session[:description] = input_json["description"] || ""
   

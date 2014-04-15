@@ -7,11 +7,21 @@ require "sinatra"
 require "omniauth"
 require "omniauth-heroku"
 require "base64"
+require "haml"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
+
+get "/timestreaming" do
+  haml :time, :locals => {:name => "bee-boop-1010"}
+end
+
+get "/latesttime" do
+  "The time now is "+Time.now.to_s
+end
+
 
 get "/" do
    if !session[:heroku_oauth_token]
@@ -40,7 +50,7 @@ get "/deploy" do
   
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { "INSTALLED_BY":"'+ installedby+'", "LAST_NAME":"'+ lastname+'", "FIRST_NAME":"'+ firstname+'"} }'
   
-  res = Excon.post('https://nyata.herokuapp.com/app-setups',
+  res = Excon.post(ENV["HEROKU_SETUP_API_URL"],
                   :body => body,
                   :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
                  )
@@ -48,39 +58,74 @@ get "/deploy" do
   # "Authorization" => "Bearer #{session[:heroku_oauth_token]}"
   # "Authorization" => "Basic OjIzZjFjYzY0LWRmMjItNDM2OS05OWMxLTExYjNkYmYyZWVjNg=="
   
-  message = MultiJson.decode(res.body)["message"] || MultiJson.decode(res.body)["status"]
+  id = MultiJson.decode(res.body)["id"] || ""
   
-  if message == "pending"
-     session[:setupid] = MultiJson.decode(res.body)["id"] || ""
-     session[:buildid] = MultiJson.decode(res.body)["build"]["id"] || ""
-     redirect "/status"
+  if(id=="invalid_params" || id=="")
+      message = MultiJson.decode(res.body)["message"]
+      body message
+  else
+    session[:setupid] = id
+    session[:appname] = MultiJson.decode(res.body)["app"]["name"]
+    redirect "/status"
   end  
-  <<-HTML
-      #{CGI.escapeHTML(sourceurl)}
-      {CGI.escapeHTML(message)}
-    HTML
 end
 
 get "/status" do
-  statuscall = Excon.new("https://nyata.herokuapp.com",
-      headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-  res = statuscall.get(path: "/app-setups/"+session[:setupid])
-  newstatus = MultiJson.decode(res.body)["status"]
-  appname = MultiJson.decode(res.body)["app"]["name"]
-  buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
-  
-  buildstatus = "None yet"
-  
-  if(buildid!="none")
-    buildcall = Excon.new("https://api.heroku.com/",
-                        headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-    buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
-    buildres = statuscall.get(path: buildcallpath )
-    buildstatus = buildres.body || "None yet"
+  # can't do much status without the setup id
+  if !session[:setupid] 
+      redirect "/deploy"
   end
-  
-  output = "Overall status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"  + "Build status: <br>" + buildstatus + "<br>" + "<i>Please refresh page for status updates</i>"
-  body output
+ 
+  haml :status, :locals => {:appname => session[:appname]}
+end
+
+get "/overall-status" do
+  # get the overall status
+  statuscall = Excon.new(ENV["HEROKU_SETUP_API_URL"],
+      headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+  res = statuscall.get(path: "/"+session[:setupid])
+  newstatus = MultiJson.decode(res.body)["status"]
+  id = MultiJson.decode(res.body)["id"]
+
+  statusmsg = "Pending"
+  if(newstatus == "failed")
+    statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
+  else if(newstatus == "succeeded")
+    statusmsg = "Link to your own clock: <a href=\"" + session[:appname] + ".herokuapp.com" + success_url + "\">Click here</a>"
+  end
+end
+
+get "/setup-details" do
+    # get the overall status
+    statuscall = Excon.new(ENV["HEROKU_SETUP_API_URL"],
+                    headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+    res = statuscall.get(path: "/"+session[:setupid])
+    newstatus = MultiJson.decode(res.body)["status"]
+ 
+    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
+    body overallstatus
+end
+
+get "/build-details" do
+    # get the build status
+    if(!session[:buildid])
+        # get the overall status
+        statuscall = Excon.new(ENV["HEROKU_SETUP_API_URL"],
+                                headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+        res = statuscall.get(path: "/"+session[:setupid])
+        buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
+    end
+    buildstatus = "None yet"
+    if(buildid!="none")
+        session[:buildid] = buildid
+        buildcall = Excon.new("https://api.heroku.com/",
+                        headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
+        buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
+        buildres = statuscall.get(path: buildcallpath )
+        buildstatus = buildres.body
+    end
+    
+    body buildstatus
 end
 
 

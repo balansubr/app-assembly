@@ -111,7 +111,7 @@ get "/build-status" do
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
-        buildstatus = "Build id"+session[:buildid]
+        
     end
     if(session[:buildid])
         buildcall = Excon.new("https://api.heroku.com/",
@@ -120,7 +120,6 @@ get "/build-status" do
         buildres = statuscall.get(path: buildcallpath )
         buildstatusdetails = MultiJson.dump(buildres.body, :pretty => true) 
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
-             
     end
     
     body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"

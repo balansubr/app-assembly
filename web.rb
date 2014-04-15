@@ -75,12 +75,10 @@ get "/overall-status" do
   statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
   res = statuscall.get(path: "/"+session[:setupid])
-  newstatus = MultiJson.decode(res.body)["status"] || "I think pending"
+  newstatus = MultiJson.decode(res.body)["status"] 
   id = MultiJson.decode(res.body)["id"]
-  
 
-
-  statusmsg = statuscall.request
+  statusmsg = "Trying with "+session[:setupid]+" Getting "+res.body
   if(newstatus == "failed")
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end

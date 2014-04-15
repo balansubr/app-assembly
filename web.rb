@@ -8,6 +8,7 @@ require "omniauth"
 require "omniauth-heroku"
 require "base64"
 require "haml"
+require "JSON"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
@@ -96,7 +97,8 @@ get "/setup-status" do
     res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
  
-    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(res.body, :pretty => true) + "<br><br>"
+
+    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + JSON.pretty_generate(res.body) + "<br><br>"
     body overallstatus
 end
 
@@ -111,7 +113,6 @@ get "/build-status" do
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
-        
     end
     if(session[:buildid])
         buildcall = Excon.new("https://api.heroku.com",
@@ -119,7 +120,7 @@ get "/build-status" do
                                    "Accept" => "application/vnd.heroku+json; version=3"  })
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         buildres = buildcall.get(path: buildcallpath)
-        buildstatusdetails = MultiJson.dump(buildres.body, :pretty => true) 
+        buildstatusdetails = JSON.pretty_generate(buildres.body) 
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
     end
     

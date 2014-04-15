@@ -156,8 +156,7 @@ get "/setup-status" do
     res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
  
-
-    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + JSON.pretty_generate(res.body) + "<br><br>"
+    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
     body overallstatus
 end
 
@@ -179,7 +178,7 @@ get "/build-status" do
                                    "Accept" => "application/vnd.heroku+json; version=3"  })
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         buildres = buildcall.get(path: buildcallpath)
-        buildstatusdetails = JSON.pretty_generate(buildres.body) 
+        buildstatusdetails = buildres.body
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
     end
     

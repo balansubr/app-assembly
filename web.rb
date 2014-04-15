@@ -14,15 +14,6 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
 
-get "/timestreaming" do
-  haml :time, :locals => {:name => "bee-boop-1010"}
-end
-
-get "/latesttime" do
-  "The time now is "+Time.now.to_s
-end
-
-
 get "/" do
    if !session[:heroku_oauth_token]
    <<-HTML
@@ -144,4 +135,5 @@ get "/getting-started" do
       <li>See the email address</li>
     </ol>
   HTML
+end
 end

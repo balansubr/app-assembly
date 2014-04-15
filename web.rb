@@ -22,6 +22,7 @@ get "/" do
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
+     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     installedby = "app-assembly" # see if there is a way to get this from the env
 
      # a better way might be to read this from a file
@@ -31,7 +32,6 @@ get "/" do
     session[:addons] = ["heroku-postgresql"]
     session[:success_url] = "/clock/currenttime"
     session[:website] = "https://github.com/balansubr/SampleTimeApp"
-    session[:source_url] = "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     haml :form, :locals => {:app => session[:aname], 
                             :desc => session[:desc], 
                             :adds => session[:addons], 
@@ -144,9 +144,8 @@ get "/overall-status" do
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
-    puts "*******************" + session[:appname]
-    puts "******************" + session[:success_url]
     statusmsg = 'Link to your own clock: <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '>Click here</a>'
+    puts "*******************" + statusmsg
   end
   
   body statusmsg

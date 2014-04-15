@@ -83,7 +83,7 @@ get "/overall-status" do
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
-    statusmsg = "Link to your own clock: <a href=\"" + session[:appname] + ".herokuapp.com/clock/currenttime/\">Click here</a>"
+    statusmsg = "Link to your own clock: <a href=\"http://" + session[:appname] + ".herokuapp.com/clock/currenttime/\">Click here</a>"
   end
   
   body statusmsg
@@ -104,22 +104,23 @@ get "/build-status" do
     # get the build status
     if(!session[:buildid])
         # get the overall status
-        statuscall = Excon.new("https://nyata.herokuapp.com/app-setups",
+        statuscall = Excon.new("https://nyata.herokuapp.com",
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
-        res = statuscall.get(path: "/"+session[:setupid])
+        res = statuscall.get(path: "/app-setups/"+session[:setupid])
         buildid = MultiJson.decode(res.body)["build"]["id"] || "none"
     end
     buildstatus = "None yet"
+    buildstatusdetails = ""
     if(buildid!="none")
         session[:buildid] = buildid
         buildcall = Excon.new("https://api.heroku.com/",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         buildcallpath = "/apps/" + appname + "/builds/" + buildid + "/result"
         buildres = statuscall.get(path: buildcallpath )
-        buildstatus = buildres.body
+        buildstatusdetails = buildres.body      
     end
     
-    body buildstatus
+    body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + MultiJson.dump(buildstatusdetails, :pretty => true) + "<br><br>"
 end
 
 

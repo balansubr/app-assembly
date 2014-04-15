@@ -89,7 +89,7 @@ get "/overall-status" do
   body statusmsg
 end
 
-get "/setup-details" do
+get "/setup-status" do
     # get the overall status
     statuscall = Excon.new(ENV["HEROKU_SETUP_API_URL"],
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
@@ -97,11 +97,10 @@ get "/setup-details" do
     newstatus = MultiJson.decode(res.body)["status"]
  
     # overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
-    body res.body
+    body "Sent "+session[:setupid]+" Received: "+res.body
 end
 
-get "/build-details" do
-    body "nothing yet"
+get "/build-status" do
     # get the build status
     if(!session[:buildid])
         # get the overall status

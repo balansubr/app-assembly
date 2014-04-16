@@ -99,7 +99,7 @@ get "/deploy" do
   id = MultiJson.decode(res.body)["id"]
   
   # if no id was returned, there was a failure. or a failure may be indicated. in either case, show failure message to user
-  if(id=="invalid_params" || id=="")
+  if(id=="invalid_params" || id=="unauthorized" || id=="")
       message = MultiJson.decode(res.body)["message"]
       body message
   else

@@ -28,7 +28,7 @@ https://app-assembly.herokuapp.com/?src=https%3A%2F%2Fgithub.com%2Fbalansubr%2FS
 
 The source url must resolve to a tarball. While it makes more sense to simply provide the source url and parse out the app.json from the tarball, its more work for app-assembly to do and app-assembly is simply a demo app at this time.
 
-To add new apps to app-assembly, simply add the app.json for that app to this folder with a unique name prefix. You may also fork this repo to add your own app.jsons.
+To add new apps to app-assembly, simply add the app.json for that app to the ```public/apps``` folder with a unique name prefix. You may also fork this repo to add your own app.jsons.
 
 After you complete the OAuth dance, app-assembly lets you fill in your own values for configuration variables specified in the app.json for that app. It also shows the default values, if any, specified in the app.json. At this time, it does not perform any validation (e.g. for variables marked as required in app.json). 
 

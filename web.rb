@@ -105,7 +105,8 @@ get "/deploy" do
   else
     # if it didn't fail, get the created app's name and then redirect to status
     session[:setupid] = id
-    session[:appname] = MultiJson.decode(res.body)["app"]["name"]
+    puts res.body
+    session[:appname] = MultiJson.decode(res.body)["app"]["name"] || "No name"
     redirect "/status"
   end  
 end

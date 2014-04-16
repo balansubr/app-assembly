@@ -100,7 +100,7 @@ get "/deploy" do
   
   #sometimes we get an unauthorized response if the oauth token expires
   if(id=="unauthorized")
-    session[:heroku_oauth_token].delete
+    session[:heroku_oauth_token] = nil
     redirect "/"
   end
   
@@ -195,7 +195,7 @@ get "/auth/heroku/callback" do
 end
 
 get "/logout" do
-  session[:heroku_oauth_token].delete
+  session[:heroku_oauth_token] = nil
   body "You are now logged out"
 end
 

@@ -23,8 +23,9 @@ get "/" do
    HTML
    else
     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
-    session[:appjsonfile] = params[:jsonlocation] || "clock_app.json"
+    session[:appjsonfile] = params[:json] || "clock_app.json"
     
+    # read the specified app.json file
     jsonstr = ''
     File.open('public/apps/'+session[:appjsonfile], 'r') do |f|
       f.each_line do |line|
@@ -33,13 +34,15 @@ get "/" do
     end
     if(jsonstr=='')
       body "Invalid app configuration specified."
-    end
-    installedby = "app-assembly" # see if there is a way to get this from the env
+    end 
 
+    # extract stuff from the app.json
     jsonparams = JSON.parse(jsonstr)
     processJson(jsonparams)
-    session[:configvar_defaults]["INSTALLED_BY"] = installedby
+    session[:configvar_defaults]["INSTALLED_BY"] = "app-assembly" # see if there is a way to get this from the env
     
+    # use the form template. give it the name and description of the app being deployed, the set of addons, 
+    # the config vars with their defaults, the website specified in the app.json and the source url of the deployment
     haml :form, :locals => {:app => session[:name], 
                             :desc => session[:description], 
                             :adds => session[:addons], 
@@ -50,11 +53,12 @@ get "/" do
    end
 end
 
+# helper method to extract stuff from the app.json
 def processJson(input_json)
   session[:name] = input_json["name"] || "No name"
   session[:description] = input_json["description"] || ""
   
-  configvar_defaults = Hash.new # this will hold the key and default value for now
+  configvar_defaults = Hash.new # this will hold the config var name and default value for now
   allvars = input_json["env"]
   allvars.each do | var, var_details |
     if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
@@ -65,28 +69,28 @@ def processJson(input_json)
   session[:addons] = input_json["addons"] 
   session[:success_url] = input_json["urls"]["success"]
   session[:website] = input_json["urls"]["website"]
-  
-  session[:configvar_defaults].each do |key, value|
-    puts key
-  end
 end
 
+# this is the target of the form submission
 get "/deploy" do
+  if !session[:heroku_oauth_token]
+    redirect "/"
+  end
   sourceurl = session[:source_url]
 
   envStr = ''
-  dochop = false
+  dochop = false # if we end up filling the envstr, we need to remove a trailing , because of how this loop below works
   params.each do |var_name, var_value|
     envStr = envStr + '"' + var_name + '":"' + var_value + '",'
     dochop = true
   end
   if(dochop) 
-     envStr.chop!   
+     envStr.chop!   # do the chop inplace
   end
 
   body = '{"source_blob": { "url":"'+ sourceurl+ '"}, "env": { ' + envStr + '} }'
-  puts body
   
+  # make the call to the setup API
   res = Excon.post("https://nyata.herokuapp.com/app-setups",
                   :body => body,
                   :headers => { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}", "Content-Type" => "application/json"}
@@ -94,36 +98,39 @@ get "/deploy" do
                  
   id = MultiJson.decode(res.body)["id"]
   
+  # if no id was returned, there was a failure. or a failure may be indicated. in either case, show failure message to user
   if(id=="invalid_params" || id=="")
       message = MultiJson.decode(res.body)["message"]
       body message
   else
+    # if it didn't fail, get the created app's name and then redirect to status
     session[:setupid] = id
     session[:appname] = MultiJson.decode(res.body)["app"]["name"]
     redirect "/status"
   end  
 end
 
+# the status page has 3 sections each of which are individually refreshed with other calls
 get "/status" do
   # can't do much status without the setup id
   if !session[:setupid] 
       redirect "/deploy"
   end
  
+  # render the status page template and give it the appname
   haml :status, :locals => {:appname => session[:appname]}
 end
 
+  # get the overall status fragment
 get "/overall-status" do
-  # get the overall status
+  # poll the setup api for status
   statuscall = Excon.new("https://nyata.herokuapp.com",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"] 
-  id = MultiJson.decode(res.body)["id"]
 
   statusmsg = newstatus
   if(newstatus == "failed")
-    puts res.body
     statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
@@ -133,6 +140,7 @@ get "/overall-status" do
   body statusmsg
 end
 
+# get the fragment for overall status
 get "/setup-status" do
     # get the overall status
     statuscall = Excon.new("https://nyata.herokuapp.com",
@@ -144,19 +152,22 @@ get "/setup-status" do
     body overallstatus
 end
 
+# get the fragment for build status
 get "/build-status" do
-    # get the build status
+    # use some defaults because builds take some time to be kicked off
     buildstatus = "Build not started"
     buildstatusdetails = "Not available"
     if(!session[:buildid])
-        # get the overall status
+        # if you don't have the build id yet, poll the setup API to see if the build has been kicked off
         statuscall = Excon.new("https://nyata.herokuapp.com",
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
+        # get the build id
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
     end
     if(session[:buildid])
+        # if indeed we have the build id now, call the build API with the app name and build id
         buildcall = Excon.new("https://api.heroku.com",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
                                    "Accept" => "application/vnd.heroku+json; version=3"  })
@@ -169,7 +180,7 @@ get "/build-status" do
     body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
 end
 
-
+# callback for heroku oauth
 get "/auth/heroku/callback" do
   session[:heroku_oauth_token] =
     request.env["omniauth.auth"]["credentials"]["token"]

@@ -98,6 +98,12 @@ get "/deploy" do
                  
   id = MultiJson.decode(res.body)["id"]
   
+  #sometimes we get an unauthorized response if the oauth token expires
+  if(id=="unauthorized")
+    session[:heroku_oauth_token].delete
+    redirect "/"
+  end
+  
   # if no id was returned, there was a failure. or a failure may be indicated. in either case, show failure message to user
   if(id=="invalid_params" || id=="unauthorized" || id=="")
       message = MultiJson.decode(res.body)["message"]
@@ -186,6 +192,11 @@ get "/auth/heroku/callback" do
   session[:heroku_oauth_token] =
     request.env["omniauth.auth"]["credentials"]["token"]
   redirect "/"
+end
+
+get "/logout" do
+  session[:heroku_oauth_token].delete
+  body "You are now logged out"
 end
 
 get "/getting-started" do

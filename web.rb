@@ -15,7 +15,7 @@ use OmniAuth::Builder do
   provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
 end
 
-# by default, the deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
+# by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
    if !session[:heroku_oauth_token]
    <<-HTML

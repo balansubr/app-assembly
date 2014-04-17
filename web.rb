@@ -181,13 +181,16 @@ get "/build-status" do
         # get the build id
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
+        
     end
     if(session[:buildid])
+        
         # if indeed we have the build id now, call the build API with the app name and build id
         buildcall = Excon.new("https://api.heroku.com",
                         headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
                                    "Accept" => "application/vnd.heroku+json; version=3"  })
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
+        puts "the build id is "+buildcallpath
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = buildres.body
         if(buildres.body)

@@ -76,6 +76,8 @@ get "/deploy" do
   if !session[:heroku_oauth_token]
     redirect "/"
   end
+  session[:setupid] = nil
+  session[:buildid] = nil
   sourceurl = session[:source_url]
 
   envStr = ''
@@ -196,7 +198,9 @@ get "/build-status" do
         buildstatusdetails = buildres.body
         if(buildres.body)
           puts buildres.body
-          buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+          if(MultiJson.decode(buildres.body)["build"])
+            buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+          end
         end
         output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     end

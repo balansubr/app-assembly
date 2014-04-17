@@ -160,7 +160,6 @@ get "/setup-status" do
     if(res.body)
       tempJson = JSON.parse(res.body)
       statusOutput = "<code>"+JSON.pretty_generate(tempJson)+"</code>"
-      puts statusOutput
     end
       
  
@@ -191,7 +190,10 @@ get "/build-status" do
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = buildres.body
-        buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+        if(buildres.body)
+          puts buildres.body
+          buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+        end
         output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     end
     

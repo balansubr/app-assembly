@@ -76,6 +76,7 @@ get "/deploy" do
   if !session[:heroku_oauth_token]
     redirect "/"
   end
+  # clear out the data that is pertinent to each deployment
   session[:setupid] = nil
   session[:buildid] = nil
   sourceurl = session[:source_url]
@@ -181,7 +182,6 @@ get "/build-status" do
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         # get the build id
-        puts res.body
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
         
@@ -195,9 +195,8 @@ get "/build-status" do
         buildcallpath = "/apps/" + session[:appname] + "/builds/" + session[:buildid] + "/result"
         puts "the build id is "+buildcallpath
         buildres = buildcall.get(path: buildcallpath)
-        buildstatusdetails = buildres.body
+        buildstatusdetails = "<code>"+buildres.body+"</code>"
         if(buildres.body)
-          puts buildres.body
           if(MultiJson.decode(buildres.body)["build"])
             buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
           end

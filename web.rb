@@ -179,6 +179,7 @@ get "/build-status" do
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         # get the build id
+        puts res.body
         buildid = MultiJson.decode(res.body)["build"]["id"]
         session[:buildid] = buildid
         

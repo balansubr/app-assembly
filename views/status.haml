@@ -1,25 +1,28 @@
 !!! 5
-%html
+%html(lang="en")
   %head
     %meta(charset="utf-8")
     %title Deployment status
+    %link{:rel => 'stylesheet', :href => 'bootstrap.css', :type => "text/css"}
+    
     :css
       #spinner{display:none;position:absolute;left:200px;top:32px;}
     %script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js")
     %script(src="/status.js")
     
   %body
-    %h2 Deployment status for #{appname}
-    This page refreshes every 5 seconds
-    #overallstatus
-      Initiated
-   
-    %h3 Setup status
-    #setupstatus
-      No details yet
-
-    %h3 Build status
-    #buildstatus
-      No details yet
+    .container
+      %h2 Deployment status for #{appname}
+      This page refreshes every 5 seconds
+      #overallstatus
+        Initiated
+     
+      %h3 Setup status
+      #setupstatus
+        No details yet
+  
+      %h3 Build status
+      #buildstatus
+        No details yet
     
     

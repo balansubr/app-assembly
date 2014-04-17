@@ -17,11 +17,14 @@ end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
+=begin
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
+=end
+
     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     session[:appjsonfile] = params[:json] || "clock_app.json"
     
@@ -50,8 +53,10 @@ get "/" do
                             :website => session[:website],
                             :source_url => session[:source_url]
                             }  
+
    end
-end
+
+#end
 
 # helper method to extract stuff from the app.json
 def processJson(input_json)
@@ -164,6 +169,7 @@ get "/build-status" do
     # use some defaults because builds take some time to be kicked off
     buildstatus = "Build not started"
     buildstatusdetails = "Not available"
+    output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     if(!session[:buildid])
         # if you don't have the build id yet, poll the setup API to see if the build has been kicked off
         statuscall = Excon.new("https://nyata.herokuapp.com",
@@ -182,9 +188,10 @@ get "/build-status" do
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = buildres.body
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
+        output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     end
     
-    body "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
+    body output
 end
 
 # callback for heroku oauth

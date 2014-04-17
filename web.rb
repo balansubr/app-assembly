@@ -163,7 +163,7 @@ get "/setup-status" do
     end
       
  
-    overallstatus = "Setup status: " + newstatus.camelize! + "<br><br>" + "Detailed status: <br>" + statusOutput + "<br><br>"
+    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + statusOutput + "<br><br>"
     body overallstatus
 end
 
@@ -191,7 +191,7 @@ get "/build-status" do
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = buildres.body
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
-        output = "Build status: " + buildstatus.camelize! + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
+        output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     end
     
     body output

@@ -17,14 +17,11 @@ end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
-=begin
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-=end
-
     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     session[:appjsonfile] = params[:json] || "clock_app.json"
     
@@ -53,10 +50,8 @@ get "/" do
                             :website => session[:website],
                             :source_url => session[:source_url]
                             }  
-
    end
-
-#end
+end
 
 # helper method to extract stuff from the app.json
 def processJson(input_json)

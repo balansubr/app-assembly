@@ -159,7 +159,7 @@ get "/setup-status" do
     
     if(res.body)
       tempJson = JSON.parse(res.body)
-      statusOutput = JSON.pretty_generate(tempJson)
+      statusOutput = "<code>"+JSON.pretty_generate(tempJson)+"</code>"
       puts statusOutput
     end
       

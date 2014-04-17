@@ -136,12 +136,12 @@ get "/overall-status" do
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"] 
 
-  statusmsg = newstatus
+  statusmsg = "Your application setup is "+newstatus
   if(newstatus == "failed")
-    statusmsg = "Failed ["+MultiJson.decode(res.body["failure_message"])+"]";
+    statusmsg = "Your application setup has failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
-    statusmsg = 'To try the app we just setup for you, <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '">Click here</a>'
+    statusmsg = 'Your application setup succeeded. To try the app we just setup for you, <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '">Click here</a>'
   end
   
   body statusmsg
@@ -154,8 +154,16 @@ get "/setup-status" do
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}" })
     res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
+    
+    statusOutput = res.body
+    
+    if(res.body)
+      tempJson = JSON.parse(res.body)
+      statusOutput = JSON.pretty_generate(tempJson)
+    end
+      
  
-    overallstatus = "Setup status: " + newstatus + "<br><br>" + "Detailed status: <br>" + res.body + "<br><br>"
+    overallstatus = "Setup status: " + newstatus.camelize + "<br><br>" + "Detailed status: <br>" + statusOutput + "<br><br>"
     body overallstatus
 end
 
@@ -183,7 +191,7 @@ get "/build-status" do
         buildres = buildcall.get(path: buildcallpath)
         buildstatusdetails = buildres.body
         buildstatus = MultiJson.decode(buildres.body)["build"]["status"]
-        output = "Build status: " + buildstatus + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
+        output = "Build status: " + buildstatus.camelize + "<br><br>" + "Detailed status: <br>" + buildstatusdetails + "<br><br>"
     end
     
     body output

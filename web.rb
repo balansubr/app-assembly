@@ -153,7 +153,7 @@ get "/overall-status" do
   statusmsg = "Your application setup is "+newstatus
   if(newstatus == "failed")
     puts res.body
-    statusmsg = "Your application setup has failed ["+MultiJson.decode(res.body["failure_message"])+"]";
+    statusmsg = "Your application setup has failed"# ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")
     statusmsg = 'Your application setup succeeded. To try the app we just setup for you, <a href="http://' + session[:appname] + '.herokuapp.com' + session[:success_url]+ '">Click here</a>'

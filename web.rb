@@ -25,6 +25,7 @@ get "/" do
     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
     
+    puts session[:appjsonfile]
     # read the specified app.json file
     jsonstr = ''
     File.open('public/apps/'+session[:appjsonfile], 'r') do |f|
@@ -60,9 +61,11 @@ def processJson(input_json)
   
   configvar_defaults = Hash.new # this will hold the config var name and default value for now
   allvars = input_json["env"]
-  allvars.each do | var, var_details |
-    if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
-      configvar_defaults[var] = var_details["default"] || ""
+  if(allvars)
+    allvars.each do | var, var_details |
+      if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
+        configvar_defaults[var] = var_details["default"] || ""
+      end
     end
   end
   session[:configvar_defaults] = configvar_defaults

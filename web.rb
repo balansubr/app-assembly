@@ -152,6 +152,7 @@ get "/overall-status" do
 
   statusmsg = "Your application setup is "+newstatus
   if(newstatus == "failed")
+    puts res.body
     statusmsg = "Your application setup has failed ["+MultiJson.decode(res.body["failure_message"])+"]";
   end
   if(newstatus == "succeeded")

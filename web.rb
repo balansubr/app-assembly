@@ -70,8 +70,10 @@ def processJson(input_json)
   end
   session[:configvar_defaults] = configvar_defaults
   session[:addons] = input_json["addons"] 
-  session[:success_url] = input_json["urls"]["success"]
-  session[:website] = input_json["urls"]["website"]
+  if(input_json["urls"])
+    session[:success_url] = input_json["urls"]["success"]
+    session[:website] = input_json["urls"]["website"]
+  end
 end
 
 # this is the target of the form submission

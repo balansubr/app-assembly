@@ -2,10 +2,8 @@
     "name": "Personalized Clock",
     "description": "A simple clock that greets you by name, everytime!",
     "keywords": ["app.json", "clock", "config"],
-    "urls": {
-        "website": "https://github.com/balansubr/SampleTimeApp",
-        "success": "/clock/currenttime"
-    },
+    "website": "https://github.com/balansubr/SampleTimeApp",
+    "success_url": "/clock/currenttime",
     "env": {
         "FIRST_NAME": {
             "description": "So that we can be personal",

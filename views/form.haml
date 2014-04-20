@@ -8,20 +8,23 @@
   %body
     .container
       %h2 Deployment details for #{app} (#{desc})
-      For more information please visit <a href="#{website}">#{website}</a>
-      %p The application will be deployed using the source at #{source_url}
+      - if(website)
+        For more information please visit <a href="#{website}">#{website}</a>
+      - if(source_url)
+        %p The application will be deployed using the source at #{source_url}
       .form-horizontal
       %form(name='input' action='/deploy' method="get")
-        %h3 The following configuration variables will be set
-        %p
-        - vars.each do | var_name, default_value |
-          #{var_name}
-          %input(type='text' name='#{var_name}' value='#{default_value}')
-          %p   
-           
-        %h3 The following addons will be added to your application
-        - adds.each do |addon_name|
-          %p #{addon_name} 
+        - if(vars)
+          %h3 The following configuration variables will be set
+          %p
+          - vars.each do | var_name, default_value |
+            #{var_name}
+            %input(type='text' name='#{var_name}' value='#{default_value}')
+            %p   
+        - if(adds)   
+          %h3 The following addons will be added to your application
+          - adds.each do |addon_name|
+            %p #{addon_name} 
                     
         %input(type='submit' value='Lets go')
         

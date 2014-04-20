@@ -40,7 +40,11 @@ get "/" do
     # extract stuff from the app.json
     jsonparams = JSON.parse(jsonstr)
     processJson(jsonparams)
-    session[:configvar_defaults]["INSTALLED_BY"] = "app-assembly" # see if there is a way to get this from the env
+    if(session[:configvar_defaults])
+      if(session[:configvar_defaults]["INSTALLED_BY"])
+        session[:configvar_defaults]["INSTALLED_BY"] = "app-assembly" # see if there is a way to get this from the env
+      end
+    end
     
     # use the form template. give it the name and description of the app being deployed, the set of addons, 
     # the config vars with their defaults, the website specified in the app.json and the source url of the deployment

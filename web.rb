@@ -29,10 +29,18 @@ get "/" do
    else
     # only preserve some elements in the session
     previous_session = session.clone
+    puts "previous_session before clear"
+    puts previous_session
     session.clear
+    puts "previous_session after clear"
+    puts previous_session
+    
     session[:heroku_oauth_token] = previous_session[:heroku_oauth_token]
     session[:source_url] = previous_session[:source_url]
     session[:appjsonfile] = previous_session[:appjsonfile]
+    puts "session after copy back"
+    puts session
+    
     puts "Using this app.json file:" + session[:appjsonfile]
     
     # read the specified app.json file

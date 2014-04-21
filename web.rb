@@ -17,28 +17,29 @@ end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
-   if(!session[:source_url])
-      session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
-      session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
-   end
    puts "This is what I got for params:"
    puts params
+   
+   # if this is a direct call, then params will have some values and we should update the session
+   if(params[:src])
+     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+     session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
+   else # this means that we got redirected here from the ouath call back
+     if(!session[:source_url]) # this shouldn't happen because we already stored the params but if it does then use defaults
+        session[:source_url] = "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+        session[:appjsonfile] = "SampleTimeApp_app.json"
+      end
+   end
+   puts "source_url in session=" + session[:source_url]
+   puts "appjsonfile in session=" + session[:appjsonfile]
 
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-    # only preserve some elements in the session
-    tmp_heroku_oauth_token = session[:heroku_oauth_token]
-    tmp_source_url = session[:source_url]
-    tmp_appjsonfile = session[:appjsonfile]
-    session.clear
-    session[:heroku_oauth_token] = tmp_heroku_oauth_token
-    session[:source_url] = tmp_source_url
-    session[:appjsonfile] = tmp_appjsonfile
-    puts "session after copy back"
-    printHash(session)
+    # remove some elements this might be a new deployment
+    
     
     puts "Using this app.json file:" + session[:appjsonfile]
     

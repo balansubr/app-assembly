@@ -39,10 +39,14 @@ get "/" do
    HTML
    else
     # remove some elements this might be a new deployment
+    session[:name] = nil
+    session[:description] = nil
+    session[:addons] = nil
+    session[:configvar_defaults] = nil
+    session[:website] = nil
+    session[:success_url] = nil
     
-    
-    puts "Using this app.json file:" + session[:appjsonfile]
-    
+    puts "Parsing this app.json file:" + session[:appjsonfile]
     # read the specified app.json file
     jsonstr = ''
     File.open('public/apps/'+session[:appjsonfile], 'r') do |f|

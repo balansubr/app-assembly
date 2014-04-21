@@ -59,6 +59,7 @@ get "/" do
     end 
 
     # extract stuff from the app.json
+    puts "Parsing json string:" + jsonStr
     jsonparams = JSON.parse(jsonstr)
     processJson(jsonparams)
     if(session[:configvar_defaults])
@@ -67,6 +68,8 @@ get "/" do
       end
     end
     
+    put "calling the form template with these session vars"
+    printHash(session)
     # use the form template. give it the name and description of the app being deployed, the set of addons, 
     # the config vars with their defaults, the website specified in the app.json and the source url of the deployment
     haml :form, :locals => {:app => session[:name], 

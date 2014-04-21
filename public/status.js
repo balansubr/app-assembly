@@ -14,5 +14,3 @@ function update_status() {
           },
           'text');
 }
-
-Xhr.Options.spinner = 'spinner';

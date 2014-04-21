@@ -14,7 +14,7 @@
         %p The application will be deployed using the source at #{source_url}
       .form-horizontal
       %form(name='input' action='/deploy' method="get")
-        - if(vars)
+        - if(!vars.empty?)
           %h3 The following configuration variables will be set
           %p
           - vars.each do | var_name, default_value |

@@ -1,16 +1,16 @@
 {
-  "name": "Geosockets",
-  "description": "Render website visitors on a map in realtime using WebSockets and the browser's Geolocation API.",
-  "keywords": ["geo", "gis", "map", "cartography", "analytics", "websockets"],
-  "website": "https://github.com/heroku-examples/geosockets",
-  "repository": "https://github.com/heroku-examples/geosockets",
-  "success_url": "https://github.com/heroku-examples/geosockets#readme",
-  "logo": "http://geosockets.herokuapp.com/geosockets.svg",
-  "addons": [
-    "openredis",
-    "papertrail"
-  ],
+  "name": "Harp Slideshow",
+  "description": "Harp, the static web server with built-in preprocessing, makes Markdown, LESS, CoffeeScript, and more, as easy to use as HTML, CSS, and JavaScript.",
+  "keywords": ["slides", "slideshow", "deck", "presentation", "powerpoint", "keynote", "harp"],
+  "repository": "https://github.com/zeke/harp-slideshow-template",
+  "website": "https://harp-slideshow-template.herokuapp.com",
+  "success_url": "/",
+  "logo": "https://harp-slideshow-template.herokuapp.com/images/harp.svg",
+  "addons": ["cdn_sumo", "swiftype"],
   "env": {
     "BUILDPACK_URL": "https://github.com/zeke/harp-buildpack"
+  },
+  "scripts": {
+    "postdeploy": "echo yay"
   }
 }

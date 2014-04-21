@@ -1,0 +1,9 @@
+{
+  "name": "Hound",
+  "description": "Review your Ruby code for style guide violations with a trusty hound.",
+  "keywords": ["ruby", "CI", "code", "testing"],
+  "website": "https://houndci.com",
+  "repository": "https://github.com/thoughtbot/hound",
+  "success_url": "https://houndci.com/sign_in",
+  "logo": "https://s3.amazonaws.com/f.cl.ly/items/342i1j2i0f1B2Z240y3u/hound.png"
+}

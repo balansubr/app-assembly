@@ -30,16 +30,16 @@ get "/" do
     # only preserve some elements in the session
     previous_session = session.clone
     puts "previous_session before clear"
-    puts previous_session
+    printHash(previous_session)
     session.clear
     puts "previous_session after clear"
-    puts previous_session
+    printHash(previous_session)
     
     session[:heroku_oauth_token] = previous_session[:heroku_oauth_token]
     session[:source_url] = previous_session[:source_url]
     session[:appjsonfile] = previous_session[:appjsonfile]
     puts "session after copy back"
-    puts session
+    printHash(session)
     
     puts "Using this app.json file:" + session[:appjsonfile]
     
@@ -73,6 +73,12 @@ get "/" do
                             :source_url => session[:source_url]
                             }  
    end
+end
+
+def printHash(hash)
+  hash.each do |key, value|
+    puts key + ' : ' + value
+  end
 end
 
 # helper method to extract stuff from the app.json

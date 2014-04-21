@@ -59,7 +59,7 @@ get "/" do
     end 
 
     # extract stuff from the app.json
-    puts "Parsing json string:" + jsonStr
+    puts "Parsing json string:" + jsonstr
     jsonparams = JSON.parse(jsonstr)
     processJson(jsonparams)
     if(session[:configvar_defaults])

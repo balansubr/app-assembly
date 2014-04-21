@@ -28,16 +28,13 @@ get "/" do
    HTML
    else
     # only preserve some elements in the session
-    previous_session = session.clone
-    puts "previous_session before clear"
-    printHash(previous_session)
+    tmp_heroku_oauth_token = session[:heroku_oauth_token]
+    tmp_source_url = session[:source_url]
+    tmp_appjsonfile = session[:appjsonfile]
     session.clear
-    puts "previous_session after clear"
-    printHash(previous_session)
-    
-    session[:heroku_oauth_token] = previous_session[:heroku_oauth_token]
-    session[:source_url] = previous_session[:source_url]
-    session[:appjsonfile] = previous_session[:appjsonfile]
+    session[:heroku_oauth_token] = tmp_heroku_oauth_token
+    session[:source_url] = tmp_source_url
+    session[:appjsonfile] = tmp_appjsonfile
     puts "session after copy back"
     printHash(session)
     

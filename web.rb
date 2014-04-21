@@ -17,8 +17,10 @@ end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
-   session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
-   session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
+   if(!session[:source_url])
+      session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+      session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
+   end
    puts "This is what I got for params:"
    puts params
 

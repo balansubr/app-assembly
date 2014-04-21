@@ -28,7 +28,7 @@ get "/" do
    HTML
    else
     # only preserve some elements in the session
-    previous_session = session
+    previous_session = session.clone
     session.clear
     session[:heroku_oauth_token] = previous_session[:heroku_oauth_token]
     session[:source_url] = previous_session[:source_url]

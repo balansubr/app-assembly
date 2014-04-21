@@ -103,8 +103,12 @@ def processJson(input_json)
   allvars = input_json["env"]
   if(allvars)
     allvars.each do | var, var_details |
-      if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
-        configvar_defaults[var] = var_details["default"] || ""
+      if(var_details.is_a?(String))
+        configvar_defaults[var] = var_details || ""
+      else
+        if(!var_details["generator"] || var_details["generator"]=="") # if something is going to be generated exclude it from the form
+          configvar_defaults[var] = var_details["default"] || ""
+        end
       end
     end
   end

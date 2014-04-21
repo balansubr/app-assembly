@@ -77,7 +77,16 @@ end
 
 def printHash(hash)
   hash.each do |key, value|
-    puts key + ' : ' + value
+    out = ''
+    if (key)
+      out = key + ":"
+    end
+    if(value)
+      out = out + value
+    else
+      out = out + "''"
+    end
+    puts out  
   end
 end
 

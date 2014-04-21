@@ -17,17 +17,17 @@ end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them
 get "/" do
+   session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
+   session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
+   puts "This is what I got for params:"
+   puts params
+
    if !session[:heroku_oauth_token]
    <<-HTML
    To deploy this app in your Heroku account, please first <a href='/auth/heroku'>Sign in with Heroku</a>
    HTML
    else
-    session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
-    session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
-    
-    puts "This is what I got for params:"
-    puts params
-    puts session[:appjsonfile]
+    puts "Using this app.json file:" + session[:appjsonfile]
     # read the specified app.json file
     jsonstr = ''
     File.open('public/apps/'+session[:appjsonfile], 'r') do |f|

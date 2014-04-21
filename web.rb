@@ -25,6 +25,8 @@ get "/" do
     session[:source_url] = params[:src] || "https://github.com/balansubr/SampleTimeApp/tarball/master/"
     session[:appjsonfile] = params[:json] || "SampleTimeApp_app.json"
     
+    puts "This is what I got for params:"
+    puts params
     puts session[:appjsonfile]
     # read the specified app.json file
     jsonstr = ''

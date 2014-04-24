@@ -12,7 +12,7 @@ require "json"
 
 use Rack::Session::Cookie, :secret => ENV["COOKIE_SECRET"]
 use OmniAuth::Builder do
-  provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "global" }
+  provider :heroku, ENV["HEROKU_OAUTH_ID"], ENV["HEROKU_OAUTH_SECRET"], { scope: "read, write-protected" }
 end
 
 # by default, this deployer is setup for a specific app.json and source url but parameters can be passed in to specify them

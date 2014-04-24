@@ -189,7 +189,7 @@ get "/overall-status" do
   # poll the setup api for status
   statuscall = Excon.new("https://api.heroku.com",
       headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
-                 "Accepts" => "application/vnd.heroku+json; version=3"})
+                 "Accept" => "application/vnd.heroku+json; version=3"})
   res = statuscall.get(path: "/app-setups/"+session[:setupid])
   newstatus = MultiJson.decode(res.body)["status"] 
 
@@ -210,7 +210,7 @@ get "/setup-status" do
     # get the overall status
     statuscall = Excon.new("https://api.heroku.com",
                     headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
-                               "Accepts" => "application/vnd.heroku+json; version=3"})
+                               "Accept" => "application/vnd.heroku+json; version=3"})
     res = statuscall.get(path: "/app-setups/"+session[:setupid])
     newstatus = MultiJson.decode(res.body)["status"] || "Not Available"
     
@@ -236,7 +236,7 @@ get "/build-status" do
         # if you don't have the build id yet, poll the setup API to see if the build has been kicked off
         statuscall = Excon.new("https://api.heroku.com",
                                 headers: { "Authorization" => "Basic #{Base64.strict_encode64(":#{session[:heroku_oauth_token]}")}",
-                                           "Accepts" => "application/vnd.heroku+json; version=3"})
+                                           "Accept" => "application/vnd.heroku+json; version=3"})
         res = statuscall.get(path: "/app-setups/"+session[:setupid])
         # get the build id
         buildid = MultiJson.decode(res.body)["build"]["id"]
